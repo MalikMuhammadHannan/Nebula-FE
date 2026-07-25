@@ -8,6 +8,8 @@ interface AuthCardProps {
   footer: ReactNode
 }
 
+
+
 export function AuthCard({ title, subtitle, children, footer }: AuthCardProps) {
   return (
     <div className="relative flex min-h-[calc(100svh-8rem)] items-center justify-center overflow-hidden px-4 py-16 sm:px-6">
@@ -32,7 +34,7 @@ export function AuthCard({ title, subtitle, children, footer }: AuthCardProps) {
           >
             N
           </motion.span>
-          <h1 className="m-0 text-2xl font-semibold">{title}</h1>
+          <h1 className="m-0 text-xl font-semibold">{title}</h1>
           <p className="mt-1 text-sm text-muted-foreground">{subtitle}</p>
         </div>
 

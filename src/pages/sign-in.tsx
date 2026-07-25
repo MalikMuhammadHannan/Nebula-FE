@@ -5,8 +5,8 @@ import { AuthCard } from "@/components/auth/auth-card"
 import { FormField } from "@/components/auth/form-field"
 import { Button } from "@/components/ui/button"
 import { PageTransition } from "@/components/layout/page-transition"
+import { EMAIL_REGEX } from "@/constants"
 
-const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
 interface SignInValues {
   email: string
@@ -15,7 +15,7 @@ interface SignInValues {
 
 type SignInErrors = Partial<Record<keyof SignInValues, string>>
 
-export function SignIn() {
+const SignIn = () => {
   const navigate = useNavigate()
   const [values, setValues] = useState<SignInValues>({ email: "", password: "" })
   const [errors, setErrors] = useState<SignInErrors>({})
@@ -89,3 +89,7 @@ export function SignIn() {
     </PageTransition>
   )
 }
+
+
+
+export default SignIn

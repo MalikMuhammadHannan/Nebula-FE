@@ -1,42 +1,26 @@
 import { useEffect } from "react"
-import { create } from "zustand"
-import { persist } from "zustand/middleware"
+import { useDispatch, useSelector } from "react-redux"
 
-export type Theme = "light" | "dark"
+import type { AppDispatch, RootState } from "@/store/store"
+import {
+  setTheme as setThemeAction,
+  toggleTheme as toggleThemeAction,
+  type Theme,
+} from "@/store/reducers/themeReducer.slice"
 
-interface ThemeState {
-  theme: Theme
-  setTheme: (theme: Theme) => void
-  toggleTheme: () => void
-}
-
-function getSystemTheme(): Theme {
-  if (typeof window === "undefined") return "light"
-  return window.matchMedia("(prefers-color-scheme: dark)").matches
-    ? "dark"
-    : "light"
-}
-
-const useThemeStore = create<ThemeState>()(
-  persist(
-    (set, get) => ({
-      theme: getSystemTheme(),
-      setTheme: (theme) => set({ theme }),
-      toggleTheme: () =>
-        set({ theme: get().theme === "dark" ? "light" : "dark" }),
-    }),
-    { name: "blog-theme" }
-  )
-)
+export type { Theme }
 
 export function useTheme() {
-  const theme = useThemeStore((state) => state.theme)
-  const setTheme = useThemeStore((state) => state.setTheme)
-  const toggleTheme = useThemeStore((state) => state.toggleTheme)
+  const theme = useSelector((state: RootState) => state.theme.theme)
+  const dispatch = useDispatch<AppDispatch>()
 
   useEffect(() => {
     document.documentElement.classList.toggle("dark", theme === "dark")
   }, [theme])
 
-  return { theme, setTheme, toggleTheme }
+  return {
+    theme,
+    setTheme: (theme: Theme) => dispatch(setThemeAction(theme)),
+    toggleTheme: () => dispatch(toggleThemeAction()),
+  }
 }

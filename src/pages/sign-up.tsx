@@ -3,10 +3,10 @@ import { Link, useNavigate } from "react-router-dom"
 
 import { AuthCard } from "@/components/auth/auth-card"
 import { FormField } from "@/components/auth/form-field"
-import { Button } from "@/components/ui/button"
 import { PageTransition } from "@/components/layout/page-transition"
+import { Button } from "@/components/ui/button"
+import { EMAIL_REGEX } from "@/constants"
 
-const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 const MIN_PASSWORD_LENGTH = 8
 
 interface SignUpValues {
@@ -18,7 +18,7 @@ interface SignUpValues {
 
 type SignUpErrors = Partial<Record<keyof SignUpValues, string>>
 
-export function SignUp() {
+const SignUp = () => {
   const navigate = useNavigate()
   const [values, setValues] = useState<SignUpValues>({
     name: "",
@@ -123,3 +123,5 @@ export function SignUp() {
     </PageTransition>
   )
 }
+
+export default SignUp

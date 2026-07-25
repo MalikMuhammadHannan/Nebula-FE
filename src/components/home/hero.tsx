@@ -1,7 +1,7 @@
+import { ArrowRight } from "lucide-react"
+import { motion, type Variants } from "motion/react"
 import { useEffect, useState } from "react"
 import { Link } from "react-router-dom"
-import { motion, type Variants } from "motion/react"
-import { ArrowRight } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { DitheringShader } from "@/components/ui/dithering-shader"

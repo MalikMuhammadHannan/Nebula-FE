@@ -1,14 +1,7 @@
 import { motion } from "motion/react"
 
 import type { BlogPost } from "@/data/blog-posts"
-
-function formatDate(dateString: string) {
-  return new Date(dateString).toLocaleDateString("en-US", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  })
-}
+import { formatDate } from "@/constants";
 
 export function BlogCard({ post, index = 0 }: { post: BlogPost; index?: number }) {
   return (

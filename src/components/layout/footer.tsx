@@ -1,14 +1,16 @@
-import { Link } from "react-router-dom"
+import { ROUTES } from "@/constants/routes"
+import dayjs from "dayjs"
 import { motion } from "motion/react"
+import { Link } from "react-router-dom"
 
 const FOOTER_LINKS = [
-  { to: "/", label: "Home" },
-  { to: "/sign-in", label: "Sign in" },
-  { to: "/sign-up", label: "Sign up" },
+  { to: ROUTES.LANDING, label: "Home" },
+  { to: ROUTES.SIGN_IN, label: "Sign in" },
+  { to: ROUTES.SIGN_UP, label: "Sign up" },
 ]
 
 export function Footer() {
-  const year = new Date().getFullYear()
+  const year = dayjs().year()
 
   return (
     <motion.footer

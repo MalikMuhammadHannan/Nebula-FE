@@ -2,7 +2,7 @@ import { PageTransition } from "@/components/layout/page-transition"
 import { Hero } from "@/components/home/hero"
 import { BlogSection } from "@/components/home/blog-section"
 
-export function Home() {
+const Home = () => {
   return (
     <PageTransition>
       <Hero />
@@ -10,3 +10,5 @@ export function Home() {
     </PageTransition>
   )
 }
+
+export default Home

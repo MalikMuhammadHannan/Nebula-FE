@@ -1,12 +1,11 @@
-import { useState } from "react"
-import { Link, NavLink } from "react-router-dom"
-import { AnimatePresence, motion } from "motion/react"
 import { Menu, Moon, Sun, X } from "lucide-react"
+import { AnimatePresence, motion } from "motion/react"
+import { useState } from "react"
+import { Link } from "react-router-dom"
 
 import { Button } from "@/components/ui/button"
-import { useTheme } from "@/hooks/use-theme"
-import { cn } from "@/lib/utils"
 import { ROUTES } from "@/constants/routes"
+import { useTheme } from "@/hooks/use-theme"
 
 const NAV_LINKS = [
   { to: "/", label: "Home" },
@@ -123,7 +122,7 @@ export function Header() {
               ))}
               <div className="mt-2 flex gap-2">
                 <Button
-                  render={<Link to="/sign-in" onClick={() => setMobileOpen(false)} />}
+                  render={<Link to={ROUTES.SIGN_IN} onClick={() => setMobileOpen(false)} />}
                   variant="outline"
                   size="sm"
                   className="flex-1"
@@ -131,7 +130,7 @@ export function Header() {
                   Sign in
                 </Button>
                 <Button
-                  render={<Link to="/sign-up" onClick={() => setMobileOpen(false)} />}
+                  render={<Link to={ROUTES.SIGN_UP} onClick={() => setMobileOpen(false)} />}
                   size="sm"
                   className="flex-1 bg-gradient-brand text-white"
                 >
