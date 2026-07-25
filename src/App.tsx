@@ -3,8 +3,9 @@ import { lazy, Suspense } from "react"
 import { Route, Routes, useLocation } from "react-router-dom"
 
 import { Layout } from "@/components/layout/layout"
-import { Loading } from "./components/ui/loading"
-import { ROUTES } from "./constants/routes"
+import { Loading } from "@/components/ui/loading"
+import { ROUTES } from "@/constants/routes"
+import ScrollToTop from "@/helper/ScrollToTop"
 
 
 const Home = lazy(() => import("@/pages/home"))
@@ -18,6 +19,7 @@ function App() {
   return (
     <Layout>
       <Suspense fallback={<Loading />}>
+        <ScrollToTop />
         <AnimatePresence mode="wait" initial={false}>
           <Routes location={location} key={location.pathname}>
             <Route path={ROUTES.LANDING} element={<Home />} />
