@@ -1,11 +1,18 @@
 import { useState, type FormEvent } from "react"
+import { useDispatch } from "react-redux"
 import { Link, useNavigate } from "react-router-dom"
 
+import { useLoginMutation } from "@/api/auth.api"
 import { AuthCard } from "@/components/auth/auth-card"
 import { FormField } from "@/components/auth/form-field"
-import { Button } from "@/components/ui/button"
 import { PageTransition } from "@/components/layout/page-transition"
+import { Button } from "@/components/ui/button"
 import { EMAIL_REGEX } from "@/constants"
+import { ROUTES } from "@/constants/routes"
+import { getApiErrorMessage } from "@/lib/apiError"
+import { setCredentials } from "@/store/reducers/authReducer.slice"
+import type { AppDispatch } from "@/store/store"
+import { toast } from "sonner"
 
 
 interface SignInValues {
@@ -17,15 +24,17 @@ type SignInErrors = Partial<Record<keyof SignInValues, string>>
 
 const SignIn = () => {
   const navigate = useNavigate()
+  const dispatch = useDispatch<AppDispatch>()
   const [values, setValues] = useState<SignInValues>({ email: "", password: "" })
   const [errors, setErrors] = useState<SignInErrors>({})
   const [submitted, setSubmitted] = useState(false)
+  const [login, { isLoading: isLoggingIn }] = useLoginMutation()
 
   function updateField(field: keyof SignInValues, value: string) {
     setValues((prev) => ({ ...prev, [field]: value }))
   }
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
 
     const nextErrors: SignInErrors = {}
@@ -36,8 +45,15 @@ const SignIn = () => {
     setErrors(nextErrors)
 
     if (Object.keys(nextErrors).length === 0) {
-      setSubmitted(true)
-      window.setTimeout(() => navigate("/"), 900)
+      try {
+        const result = await login({ email: values.email, password: values.password }).unwrap();
+        dispatch(setCredentials({ user: result.user, token: result.access_token }));
+        toast.success("Login successful!");
+        setSubmitted(true)
+        navigate(ROUTES.DASHBOARD, { replace: true })
+      } catch (error) {
+        toast.error(getApiErrorMessage(error));
+      }
     }
   }
 
@@ -80,9 +96,10 @@ const SignIn = () => {
           <Button
             type="submit"
             size="lg"
+            disabled={isLoggingIn}
             className="mt-2 bg-gradient-brand text-white hover:opacity-90"
           >
-            {submitted ? "Signed in — redirecting…" : "Sign in"}
+            {submitted ? "Signed in — redirecting…" : isLoggingIn ? "Signing in…" : "Sign in"}
           </Button>
         </form>
       </AuthCard>
