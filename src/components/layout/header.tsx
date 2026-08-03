@@ -73,20 +73,19 @@ export function Header() {
             </AnimatePresence>
           </motion.button>
 
-          <Button
-            render={<Link to={ROUTES.SIGN_IN} />}
-            variant="ghost"
-            size="sm"
-            className="hidden sm:inline-flex"
-          >
-            Sign in
+          <Button asChild variant="outline" size="sm" className="flex-1">
+            <Link to={ROUTES.SIGN_IN} onClick={() => setMobileOpen(false)}>
+              Sign in
+            </Link>
           </Button>
           <Button
-            render={<Link to={ROUTES.SIGN_UP} />}
+            asChild
             size="sm"
-            className="hidden bg-gradient-brand text-white hover:opacity-90 sm:inline-flex"
+            className="flex-1 bg-gradient-brand text-white"
           >
-            Sign up
+            <Link to={ROUTES.SIGN_UP} onClick={() => setMobileOpen(false)}>
+              Sign up
+            </Link>
           </Button>
 
           <button
@@ -122,19 +121,22 @@ export function Header() {
               ))}
               <div className="mt-2 flex gap-2">
                 <Button
-                  render={<Link to={ROUTES.SIGN_IN} onClick={() => setMobileOpen(false)} />}
-                  variant="outline"
-                  size="sm"
-                  className="flex-1"
-                >
-                  Sign in
-                </Button>
-                <Button
-                  render={<Link to={ROUTES.SIGN_UP} onClick={() => setMobileOpen(false)} />}
+                  asChild
                   size="sm"
                   className="flex-1 bg-gradient-brand text-white"
                 >
-                  Sign up
+                  <Link to={ROUTES.SIGN_IN} onClick={() => setMobileOpen(false)}>
+                    Sign in
+                  </Link>
+                </Button>
+                <Button
+                  asChild
+                  size="sm"
+                  className="flex-1 bg-gradient-brand text-white"
+                >
+                  <Link to={ROUTES.SIGN_UP} onClick={() => setMobileOpen(false)}>
+                    Sign up
+                  </Link>
                 </Button>
               </div>
             </div>

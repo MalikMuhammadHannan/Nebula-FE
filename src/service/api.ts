@@ -15,6 +15,7 @@ const baseQuery = fetchBaseQuery({
 
 export const RtkQueryTags = {
     AUTH: "auth",
+    BLOG: "blog",
 }
 
 

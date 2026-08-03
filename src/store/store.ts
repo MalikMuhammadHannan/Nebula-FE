@@ -1,3 +1,7 @@
+import { api } from "@/service/api"
+import authReducer from "@/store/reducers/authReducer.slice"
+import themeReducer from "@/store/reducers/themeReducer.slice"
+import storage from "@/store/storage"
 import { combineReducers, configureStore } from "@reduxjs/toolkit"
 import {
   FLUSH,
@@ -9,13 +13,11 @@ import {
   persistReducer,
   persistStore,
 } from "redux-persist"
-import themeReducer from "@/store/reducers/themeReducer.slice"
-import authReducer from "@/store/reducers/authReducer.slice"
-import storage from "@/store/storage"
 
 const rootReducer = combineReducers({
   theme: themeReducer,
   auth: authReducer,
+  [api.reducerPath]: api.reducer,
 })
 
 const persistConfig = {
@@ -33,7 +35,7 @@ export const store = configureStore({
       serializableCheck: {
         ignoredActions: [FLUSH, PAUSE, PERSIST, PURGE, REGISTER, REHYDRATE],
       },
-    }),
+    }).concat(api.middleware),
 })
 
 export const persistor = persistStore(store)

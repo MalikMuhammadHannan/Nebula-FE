@@ -80,7 +80,7 @@ export const appRoutes: AppRoute[] = [
             label: "Blogs",
             group: "blogs",
         },
-        roles: ["EDITOR", "ADMIN"],
+        roles: ["USER", "EDITOR", "ADMIN"],
     },
     {
         path: ROUTES.PROFILE,
