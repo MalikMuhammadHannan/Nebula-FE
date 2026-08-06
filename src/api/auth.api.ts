@@ -19,6 +19,12 @@ interface LoginResponse {
     user: User
 }
 
+export interface SignUpPayload {
+    full_name: string;
+    email: string;
+    password: string;
+}
+
 export const authApi = api.injectEndpoints({
     endpoints: (builder) => ({
         login: builder.mutation<LoginResponse, LoginCredentials>({
@@ -28,7 +34,7 @@ export const authApi = api.injectEndpoints({
                 body: credentials,
             }),
         }),
-        signUp: builder.mutation({
+        signUp: builder.mutation<User, SignUpPayload>({
             query: (credentials) => ({
                 url: "/auth/register",
                 method: API_METHODS.POST,

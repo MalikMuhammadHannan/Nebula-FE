@@ -10,6 +10,7 @@ export const ROUTES = {
     DASHBOARD: "/dashboard",
 
     BLOGS: "/dashboard/blogs",
+    BLOG: "/dashboard/blogs/:id",
 
     AI_GENERATOR: "/dashboard/ai-blogs",
     DOCUMENTS_GENERATOR: "/dashboard/document-blogs",

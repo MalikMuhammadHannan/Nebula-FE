@@ -152,7 +152,7 @@ export function TableStructure<T>({
               </thead>
               <tbody className="divide-y divide-neutral-200">
                 {loading ? (
-                  [...Array(10)].map((_, rowIndex) => (
+                  [...Array(5)].map((_, rowIndex) => (
                     <tr key={`shimmer-${rowIndex}`}>
                       {columns.map((col) => (
                         <td key={col.key} className="px-2 sm:px-4 py-2 sm:py-3">

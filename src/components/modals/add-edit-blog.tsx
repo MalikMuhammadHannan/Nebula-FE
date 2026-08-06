@@ -1,8 +1,8 @@
-import { useEffect, useState, type FormEvent } from "react"
+import { useEffect, useState, type ChangeEvent, type FormEvent } from "react"
 import { toast } from "sonner"
 
 import type { Blog } from "@/api/blog.api"
-import { useCreateBlogMutation, useUpdateBlogMutation } from "@/api/blog.api"
+import { useCreateBlogMutation, useUpdateBlogMutation, useUploadImageMutation } from "@/api/blog.api"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -33,9 +33,11 @@ interface AddEditBlogProps {
 const AddEditBlog = ({ isOpen, onClose, blog }: AddEditBlogProps) => {
   const isEditing = Boolean(blog)
   const [values, setValues] = useState<AddEditBlogValues>(EMPTY_VALUES)
+  const [imageFile, setImageFile] = useState<File | null>(null)
   const [createBlog, { isLoading: isCreating }] = useCreateBlogMutation()
   const [updateBlog, { isLoading: isUpdating }] = useUpdateBlogMutation()
-  const isSaving = isCreating || isUpdating
+  const [uploadImage, { isLoading: isUploading }] = useUploadImageMutation()
+  const isSaving = isCreating || isUpdating || isUploading
 
   useEffect(() => {
     if (isOpen) {
@@ -49,6 +51,7 @@ const AddEditBlog = ({ isOpen, onClose, blog }: AddEditBlogProps) => {
           }
           : EMPTY_VALUES
       )
+      setImageFile(null)
     }
   }, [isOpen, blog])
 
@@ -56,17 +59,29 @@ const AddEditBlog = ({ isOpen, onClose, blog }: AddEditBlogProps) => {
     setValues((prev) => ({ ...prev, [field]: value }))
   }
 
+  function handleImageChange(event: ChangeEvent<HTMLInputElement>) {
+    setImageFile(event.target.files?.[0] ?? null)
+  }
+
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
 
-    const payload = {
-      title: values.title,
-      description: values.description,
-      image_url: values.image_url || null,
-      content: values.content,
-    }
-
     try {
+      let image_url: string | null = isEditing ? values.image_url || null : null
+      if (imageFile) {
+        const formData = new FormData()
+        formData.append("file", imageFile)
+        const uploadResult = await uploadImage(formData).unwrap()
+        image_url = uploadResult.image_url
+      }
+
+      const payload = {
+        title: values.title,
+        description: values.description,
+        image_url,
+        content: values.content,
+      }
+
       if (isEditing && blog) {
         await updateBlog({ id: blog.id, data: payload }).unwrap()
         toast.success("Blog updated successfully")
@@ -120,14 +135,13 @@ const AddEditBlog = ({ isOpen, onClose, blog }: AddEditBlogProps) => {
         </div>
 
         <div className="flex flex-col gap-1.5">
-          <Label htmlFor="image_url">Image URL</Label>
-          <Input
-            id="image_url"
-            type="url"
-            placeholder="https://..."
-            value={values.image_url}
-            onChange={(event) => updateField("image_url", event.target.value)}
-          />
+          <Label htmlFor="image">Image</Label>
+          <Input id="image" type="file" accept="image/*" onChange={handleImageChange} />
+          {!imageFile && values.image_url ? (
+            <p className="text-muted-foreground text-xs">
+              Current image will be kept unless a new one is selected.
+            </p>
+          ) : null}
         </div>
 
         <div className="mt-2 flex justify-end gap-2">

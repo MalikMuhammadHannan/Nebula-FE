@@ -40,6 +40,9 @@ const Blogs = React.lazy(
 const Profile = React.lazy(
     () => import("@/pages/profile")
 );
+const BlogDetail = React.lazy(
+    () => import("@/pages/blog-detail")
+);
 
 
 export const appRoutes: AppRoute[] = [
@@ -60,7 +63,9 @@ export const appRoutes: AppRoute[] = [
             label: "Document Blogs",
             group: "ai",
         },
-        roles: ["EDITOR", "ADMIN"],
+        // roles: ["EDITOR", "ADMIN"],
+        roles: ["USER", "EDITOR", "ADMIN"],
+
     },
     {
         path: ROUTES.AI_GENERATOR,
@@ -70,7 +75,9 @@ export const appRoutes: AppRoute[] = [
             label: "AI Blogs",
             group: "ai",
         },
-        roles: ["EDITOR", "ADMIN"],
+        // roles: ["EDITOR", "ADMIN"],
+        roles: ["USER", "EDITOR", "ADMIN"],
+
     },
     {
         path: ROUTES.BLOGS,
@@ -92,6 +99,7 @@ export const appRoutes: AppRoute[] = [
         },
         roles: ["EDITOR", "ADMIN", "USER"],
     },
+
 ];
 
 export function getAccessibleRoutes(role?: string | null): AppRoute[] {

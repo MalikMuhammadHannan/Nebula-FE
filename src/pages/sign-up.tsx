@@ -1,13 +1,17 @@
 import { useState, type FormEvent } from "react"
 import { Link, useNavigate } from "react-router-dom"
+import { toast } from "sonner"
 
+import { useSignUpMutation } from "@/api/auth.api"
 import { AuthCard } from "@/components/auth/auth-card"
 import { FormField } from "@/components/auth/form-field"
 import { PageTransition } from "@/components/layout/page-transition"
 import { Button } from "@/components/ui/button"
 import { EMAIL_REGEX } from "@/constants"
+import { ROUTES } from "@/constants/routes"
+import { getApiErrorMessage } from "@/lib/apiError"
 
-const MIN_PASSWORD_LENGTH = 8
+const MIN_PASSWORD_LENGTH = 4
 
 interface SignUpValues {
   name: string
@@ -28,12 +32,13 @@ const SignUp = () => {
   })
   const [errors, setErrors] = useState<SignUpErrors>({})
   const [submitted, setSubmitted] = useState(false)
+  const [signUp, { isLoading: isSigningUp }] = useSignUpMutation()
 
   function updateField(field: keyof SignUpValues, value: string) {
     setValues((prev) => ({ ...prev, [field]: value }))
   }
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
 
     const nextErrors: SignUpErrors = {}
@@ -48,10 +53,19 @@ const SignUp = () => {
 
     setErrors(nextErrors)
 
-    // UI-only form — no backend is wired up in this project yet.
     if (Object.keys(nextErrors).length === 0) {
-      setSubmitted(true)
-      window.setTimeout(() => navigate("/"), 900)
+      try {
+        await signUp({
+          full_name: values.name,
+          email: values.email,
+          password: values.password,
+        }).unwrap()
+        toast.success("Account created successfully")
+        setSubmitted(true)
+        window.setTimeout(() => navigate(ROUTES.SIGN_IN), 900)
+      } catch (error) {
+        toast.error(getApiErrorMessage(error))
+      }
     }
   }
 
@@ -114,9 +128,14 @@ const SignUp = () => {
           <Button
             type="submit"
             size="lg"
+            disabled={isSigningUp}
             className="mt-2 bg-gradient-brand text-white hover:opacity-90"
           >
-            {submitted ? "Account created — redirecting…" : "Sign up"}
+            {submitted
+              ? "Account created — redirecting…"
+              : isSigningUp
+                ? "Signing up…"
+                : "Sign up"}
           </Button>
         </form>
       </AuthCard>

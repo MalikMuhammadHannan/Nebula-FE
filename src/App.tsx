@@ -11,7 +11,7 @@ import ScrollToTop from "@/helper/ScrollToTop"
 import { getAccessibleRoutes } from "@/router/app-routes"
 import type { RootState } from "@/store/store"
 
-
+const BlogDetail = lazy(() => import("@/pages/blog-detail"))
 const Home = lazy(() => import("@/pages/home"))
 const SignIn = lazy(() => import("@/pages/sign-in"))
 const SignUp = lazy(() => import("@/pages/sign-up"))
@@ -31,6 +31,7 @@ function App() {
             <Route path={ROUTES.LANDING} element={<Home />} />
             <Route path={ROUTES.SIGN_IN} element={<SignIn />} />
             <Route path={ROUTES.SIGN_UP} element={<SignUp />} />
+            <Route path={ROUTES.BLOG} element={<BlogDetail />} />
           </Route>
 
           <Route element={<ProtectedLayout />}>
