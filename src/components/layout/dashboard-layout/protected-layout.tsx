@@ -14,6 +14,7 @@ const ProtectedLayout = () => {
     const location = useLocation()
     const token = useSelector((state: RootState) => state.auth.token)
     const [sidebarOpen, setSidebarOpen] = useState(false)
+    const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
 
     if (!token) {
         return <Navigate to={ROUTES.SIGN_IN} state={{ from: location }} replace />
@@ -21,7 +22,12 @@ const ProtectedLayout = () => {
 
     return (
         <div className="flex min-h-svh bg-background text-foreground">
-            <SideBar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+            <SideBar
+                open={sidebarOpen}
+                onClose={() => setSidebarOpen(false)}
+                collapsed={sidebarCollapsed}
+                onToggleCollapse={() => setSidebarCollapsed((collapsed) => !collapsed)}
+            />
 
             <div className="flex min-w-0 flex-1 flex-col">
                 <Header onMenuClick={() => setSidebarOpen(true)} />

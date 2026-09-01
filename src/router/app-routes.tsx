@@ -1,10 +1,12 @@
-import React from "react";
 import { ROUTES } from "@/constants/routes";
 import {
-    LayoutDashboard,
+    ChartNoAxesColumn,
     FileText,
+    LayoutDashboard,
     Sparkles,
+    UserRound,
 } from "lucide-react";
+import React from "react";
 
 
 export type Role = "ADMIN" | "EDITOR" | "USER";
@@ -83,7 +85,7 @@ export const appRoutes: AppRoute[] = [
         path: ROUTES.BLOGS,
         element: Blogs,
         sidebar: {
-            icon: <Sparkles size={20} />,
+            icon: <ChartNoAxesColumn size={20} />,
             label: "Blogs",
             group: "blogs",
         },
@@ -93,7 +95,7 @@ export const appRoutes: AppRoute[] = [
         path: ROUTES.PROFILE,
         element: Profile,
         sidebar: {
-            icon: <Sparkles size={20} />,
+            icon: <UserRound size={20} />,
             label: "Profile",
             group: "account",
         },

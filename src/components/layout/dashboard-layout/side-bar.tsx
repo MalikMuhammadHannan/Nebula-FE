@@ -1,3 +1,4 @@
+import { ChevronLeft, ChevronRight } from "lucide-react"
 import { AnimatePresence, motion } from "motion/react"
 import { useSelector } from "react-redux"
 import { NavLink } from "react-router-dom"
@@ -36,29 +37,33 @@ function groupRoutes(routes: AppRoute[]) {
 
 interface SideBarContentProps {
   onNavigate?: () => void
+  collapsed?: boolean
 }
 
-function SideBarContent({ onNavigate }: SideBarContentProps) {
+function SideBarContent({ onNavigate, collapsed }: SideBarContentProps) {
   const role = useSelector((state: RootState) => state.auth.user?.role)
   const groups = groupRoutes(getAccessibleRoutes(role))
 
   return (
-    <div className="flex h-full flex-col gap-6 overflow-y-auto px-4 py-5">
+    <div className="flex h-full flex-col gap-6 overflow-y-auto px-3 py-5">
       <NavLink
         to={ROUTES.DASHBOARD}
         onClick={onNavigate}
-        className="flex items-center gap-2 px-2 text-lg font-semibold tracking-tight"
+        className={cn(
+          "flex items-center gap-2 px-2 text-lg font-semibold tracking-tight",
+          collapsed && "justify-center px-0"
+        )}
       >
         <span className="inline-flex size-8 shrink-0 items-center justify-center rounded-full bg-gradient-brand text-sm font-bold text-white shadow-[0_0_20px_var(--brand-glow)]">
           N
         </span>
-        <span className="text-gradient-brand">Nebula</span>
+        {!collapsed && <span className="text-gradient-brand">Nebula</span>}
       </NavLink>
 
       <nav className="flex flex-1 flex-col gap-5">
         {groups.map((group) => (
           <div key={group.key} className="flex flex-col gap-1">
-            {group.label && (
+            {group.label && !collapsed && (
               <span className="px-2 text-xs font-medium tracking-wide text-sidebar-foreground/50 uppercase">
                 {group.label}
               </span>
@@ -69,15 +74,17 @@ function SideBarContent({ onNavigate }: SideBarContentProps) {
                 to={route.path}
                 end={route.path === ROUTES.DASHBOARD}
                 onClick={onNavigate}
+                title={collapsed ? route.sidebar?.label : undefined}
                 className={({ isActive }) =>
                   cn(
                     "flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm font-medium text-sidebar-foreground/80 transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
+                    collapsed && "justify-center px-0",
                     isActive && "bg-sidebar-accent text-sidebar-accent-foreground"
                   )
                 }
               >
                 {route.sidebar?.icon}
-                {route.sidebar?.label}
+                {!collapsed && route.sidebar?.label}
               </NavLink>
             ))}
           </div>
@@ -90,13 +97,35 @@ function SideBarContent({ onNavigate }: SideBarContentProps) {
 interface SideBarProps {
   open: boolean
   onClose: () => void
+  collapsed?: boolean
+  onToggleCollapse?: () => void
 }
 
-const SideBar = ({ open, onClose }: SideBarProps) => {
+const SideBar = ({ open, onClose, collapsed = false, onToggleCollapse }: SideBarProps) => {
   return (
     <>
-      <aside className="hidden w-64 shrink-0 border-r border-sidebar-border bg-sidebar text-sidebar-foreground md:block">
-        <SideBarContent />
+      <aside
+        className={cn(
+          "relative hidden shrink-0 border-r border-sidebar-border bg-sidebar text-sidebar-foreground transition-[width] duration-200 ease-in-out md:block",
+          collapsed ? "w-20" : "w-64"
+        )}
+      >
+        <SideBarContent collapsed={collapsed} />
+
+        {onToggleCollapse && (
+          <button
+            type="button"
+            onClick={onToggleCollapse}
+            aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+            className="cursor-pointer absolute z-50 top-14 -right-3 flex size-6 items-center justify-center rounded-full bg-gradient-brand text-white shadow-[0_0_12px_var(--brand-glow)] transition-transform hover:scale-110"
+          >
+            {collapsed ? (
+              <ChevronRight className="size-3.5" />
+            ) : (
+              <ChevronLeft className="size-3.5" />
+            )}
+          </button>
+        )}
       </aside>
 
       <AnimatePresence>
