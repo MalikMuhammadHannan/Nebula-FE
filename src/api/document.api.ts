@@ -17,6 +17,12 @@ export interface DocumentSession {
     created_at: string;
 }
 
+export interface ChatTurn {
+    id: number;
+    query: string;
+    blogs: Blog[];
+}
+
 export const documentApi = api.injectEndpoints({
     endpoints: (builder) => ({
         uploadDocument: builder.mutation<UploadDocumentResponse, FormData>({
@@ -33,6 +39,9 @@ export const documentApi = api.injectEndpoints({
                 method: API_METHODS.POST,
                 body,
             }),
+            invalidatesTags: (_result, _error, { session_id }) => [
+                { type: RtkQueryTags.DOCUMENT, id: session_id },
+            ],
         }),
         getAllSessions: builder.query<DocumentSession[], void>({
             query: () => ({
@@ -48,6 +57,15 @@ export const documentApi = api.injectEndpoints({
             }),
             invalidatesTags: [RtkQueryTags.DOCUMENT],
         }),
+        getChatHistory: builder.query<ChatTurn[], string>({
+            query: (sessionId) => ({
+                url: `/document/${sessionId}/history`,
+                method: API_METHODS.GET,
+            }),
+            providesTags: (_result, _error, sessionId) => [
+                { type: RtkQueryTags.DOCUMENT, id: sessionId },
+            ],
+        }),
     }),
 });
 
@@ -56,4 +74,5 @@ export const {
     useQueryDocumentMutation,
     useGetAllSessionsQuery,
     useDeleteSessionMutation,
+    useGetChatHistoryQuery,
 } = documentApi;

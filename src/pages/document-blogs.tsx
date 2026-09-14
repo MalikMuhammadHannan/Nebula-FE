@@ -1,11 +1,11 @@
-import { Plus } from "lucide-react"
-import { useState, type ChangeEvent, type FormEvent } from "react"
+import { Loader2, Plus, SendHorizontal, Upload } from "lucide-react"
+import { useEffect, useRef, useState, type ChangeEvent, type FormEvent, type KeyboardEvent } from "react"
 import { toast } from "sonner"
 
-import type { Blog } from "@/api/blog.api"
 import {
   useDeleteSessionMutation,
   useGetAllSessionsQuery,
+  useGetChatHistoryQuery,
   useQueryDocumentMutation,
   useUploadDocumentMutation,
   type DocumentSession,
@@ -25,24 +25,31 @@ const DocumentBlogs = () => {
   const [file, setFile] = useState<File | null>(null)
   const [sessionId, setSessionId] = useState<string | null>(null)
   const [query, setQuery] = useState("")
-  const [results, setResults] = useState<Blog[]>([])
+  const [pendingQuery, setPendingQuery] = useState<string | null>(null)
   const [deleteTarget, setDeleteTarget] = useState<DocumentSession | null>(null)
+  const bottomRef = useRef<HTMLDivElement>(null)
 
   const { data: sessions, isLoading: isLoadingSessions } = useGetAllSessionsQuery()
+  const { data: history, isLoading: isLoadingHistory } = useGetChatHistoryQuery(sessionId ?? "", {
+    skip: !sessionId,
+  })
   const [uploadDocument, { isLoading: isUploading }] = useUploadDocumentMutation()
   const [queryDocument, { isLoading: isQuerying }] = useQueryDocumentMutation()
   const [deleteSession, { isLoading: isDeleting }] = useDeleteSessionMutation()
 
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({ behavior: "smooth" })
+  }, [history, pendingQuery])
+
   function handleSelectSession(session_id: string) {
     setSessionId(session_id)
-    setResults([])
   }
 
   function handleNewChat() {
     setSessionId(null)
     setFile(null)
     setQuery("")
-    setResults([])
+    setPendingQuery(null)
   }
 
   async function handleDeleteSession() {
@@ -71,7 +78,7 @@ const DocumentBlogs = () => {
       formData.append("file", file)
       const { session_id } = await uploadDocument(formData).unwrap()
       setSessionId(session_id)
-      setResults([])
+      setFile(null)
       toast.success("Document uploaded successfully")
     } catch (error) {
       toast.error(getApiErrorMessage(error))
@@ -80,19 +87,31 @@ const DocumentBlogs = () => {
 
   async function handleQuery(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
-    if (!sessionId || !query.trim()) return
+    const trimmed = query.trim()
+    if (!sessionId || !trimmed) return
 
+    setQuery("")
+    setPendingQuery(trimmed)
     try {
-      const blogs = await queryDocument({ session_id: sessionId, query }).unwrap()
-      setResults(blogs)
+      await queryDocument({ session_id: sessionId, query: trimmed }).unwrap()
     } catch (error) {
       toast.error(getApiErrorMessage(error))
+      setQuery(trimmed)
+    } finally {
+      setPendingQuery(null)
+    }
+  }
+
+  function handleTextareaKeyDown(event: KeyboardEvent<HTMLTextAreaElement>) {
+    if (event.key === "Enter" && !event.shiftKey) {
+      event.preventDefault()
+      event.currentTarget.form?.requestSubmit()
     }
   }
 
   return (
-    <div className="flex gap-6">
-      <Card className="h-fit w-64 shrink-0">
+    <div className="flex h-[calc(100svh-8rem)] gap-6">
+      <Card className="flex h-full w-64 shrink-0 flex-col">
         <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle>Sessions</CardTitle>
           <Button type="button" size="sm" variant="outline" onClick={handleNewChat}>
@@ -100,7 +119,7 @@ const DocumentBlogs = () => {
             New
           </Button>
         </CardHeader>
-        <CardContent className="flex flex-col gap-1">
+        <CardContent className="flex flex-1 flex-col gap-1 overflow-y-auto">
           {isLoadingSessions ? (
             <p className="text-xs text-muted-foreground">Loading…</p>
           ) : !sessions?.length ? (
@@ -137,75 +156,106 @@ const DocumentBlogs = () => {
         </CardContent>
       </Card>
 
-      <div className="flex min-w-0 flex-1 flex-col gap-6">
-        <Card>
-          <CardHeader>
-            <CardTitle>Upload Document</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleUpload} className="flex flex-col gap-4">
-              <div className="flex flex-col gap-1.5">
+      <Card className="flex h-full min-w-0 flex-1 flex-col">
+        {!sessionId ? (
+          <CardContent className="flex flex-1 flex-col items-center justify-center gap-4 p-6 text-center">
+            <div className="flex size-12 items-center justify-center rounded-full bg-muted">
+              <Upload className="size-5 text-muted-foreground" />
+            </div>
+            <div className="flex flex-col gap-1">
+              <p className="text-sm font-medium text-foreground">Upload a document to start</p>
+              <p className="text-xs text-muted-foreground">
+                Ask questions about it and generate blog posts grounded in its content.
+              </p>
+            </div>
+            <form onSubmit={handleUpload} className="flex w-full max-w-sm flex-col gap-3">
+              <div className="flex flex-col gap-1.5 text-left">
                 <Label htmlFor="document">Document</Label>
                 <Input id="document" type="file" onChange={handleFileChange} required />
               </div>
-              <div>
-                <Button type="submit" disabled={!file || isUploading}>
-                  {isUploading ? "Uploading…" : "Upload"}
-                </Button>
-              </div>
-              {sessionId && (
-                <p className="text-xs text-muted-foreground">
-                  Document ready — session {sessionId}
-                </p>
-              )}
+              <Button type="submit" disabled={!file || isUploading} loading={isUploading}>
+                Upload
+              </Button>
             </form>
           </CardContent>
-        </Card>
+        ) : (
+          <>
+            <CardContent className="flex flex-1 flex-col gap-4 overflow-y-auto">
+              {isLoadingHistory ? (
+                <p className="text-center text-sm text-muted-foreground">Loading conversation…</p>
+              ) : !history?.length && !pendingQuery ? (
+                <p className="text-center text-sm text-muted-foreground">
+                  Ask a question about your document to get started.
+                </p>
+              ) : (
+                history?.map((turn) => (
+                  <div key={turn.id} className="flex flex-col gap-2">
+                    <div className="flex justify-end">
+                      <div className="max-w-[75%] rounded-2xl rounded-br-sm bg-primary px-3.5 py-2 text-sm text-primary-foreground">
+                        {turn.query}
+                      </div>
+                    </div>
+                    <div className="flex justify-start">
+                      {turn.blogs.length > 0 ? (
+                        <div className="flex max-w-[75%] flex-col gap-1 rounded-2xl rounded-bl-sm bg-muted px-3.5 py-2.5">
+                          <p className="text-sm font-semibold text-foreground">{turn.blogs[0].title}</p>
+                          <p className="text-xs text-muted-foreground">{turn.blogs[0].description}</p>
+                          <p className="whitespace-pre-wrap text-sm text-foreground">
+                            {turn.blogs[0].content}
+                          </p>
+                        </div>
+                      ) : (
+                        <div className="max-w-[75%] rounded-2xl rounded-bl-sm bg-muted px-3.5 py-2 text-sm text-muted-foreground italic">
+                          No answer found in the document for this question.
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                ))
+              )}
 
-        {sessionId && (
-          <Card>
-            <CardHeader>
-              <CardTitle>Ask about your document</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <form onSubmit={handleQuery} className="flex flex-col gap-4">
-                <div className="flex flex-col gap-1.5">
-                  <Label htmlFor="query">Query</Label>
-                  <Textarea
-                    id="query"
-                    required
-                    rows={3}
-                    placeholder="Generate a blog post about..."
-                    value={query}
-                    onChange={(event) => setQuery(event.target.value)}
-                  />
+              {pendingQuery && (
+                <div className="flex flex-col gap-2">
+                  <div className="flex justify-end">
+                    <div className="max-w-[75%] rounded-2xl rounded-br-sm bg-primary px-3.5 py-2 text-sm text-primary-foreground">
+                      {pendingQuery}
+                    </div>
+                  </div>
+                  <div className="flex justify-start">
+                    <div className="flex items-center gap-2 rounded-2xl rounded-bl-sm bg-muted px-3.5 py-2.5 text-sm text-muted-foreground">
+                      <Loader2 className="size-3.5 animate-spin" />
+                      Thinking…
+                    </div>
+                  </div>
                 </div>
-                <div>
-                  <Button type="submit" disabled={!query.trim() || isQuerying}>
-                    {isQuerying ? "Generating…" : "Generate"}
-                  </Button>
-                </div>
-              </form>
+              )}
+
+              <div ref={bottomRef} />
             </CardContent>
-          </Card>
-        )}
 
-        {results.length > 0 && (
-          <div className="flex flex-col gap-4">
-            {results.map((blog) => (
-              <Card key={blog.id}>
-                <CardHeader>
-                  <CardTitle>{blog.title}</CardTitle>
-                </CardHeader>
-                <CardContent className="flex flex-col gap-2">
-                  <p className="text-sm text-muted-foreground">{blog.description}</p>
-                  <p className="whitespace-pre-wrap text-sm text-foreground">{blog.content}</p>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+            <div className="border-t border-border/60 p-4">
+              <form onSubmit={handleQuery} className="flex items-end gap-2">
+                <Textarea
+                  rows={1}
+                  className="max-h-32 flex-1 resize-none"
+                  placeholder="Ask about your document…"
+                  value={query}
+                  onChange={(event) => setQuery(event.target.value)}
+                  onKeyDown={handleTextareaKeyDown}
+                />
+                <Button
+                  type="submit"
+                  size="icon"
+                  disabled={!query.trim() || isQuerying}
+                  loading={isQuerying}
+                >
+                  {!isQuerying && <SendHorizontal className="size-4" />}
+                </Button>
+              </form>
+            </div>
+          </>
         )}
-      </div>
+      </Card>
 
       <ConfirmationModal
         isOpen={Boolean(deleteTarget)}

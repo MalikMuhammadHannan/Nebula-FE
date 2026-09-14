@@ -1,11 +1,14 @@
 import { Menu, Moon, Sun, X } from "lucide-react"
 import { AnimatePresence, motion } from "motion/react"
 import { useState } from "react"
-import { Link } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
 
 import { Button } from "@/components/ui/button"
 import { ROUTES } from "@/constants/routes"
 import { useTheme } from "@/hooks/use-theme"
+import { logout } from "@/store/reducers/authReducer.slice"
+import type { AppDispatch, RootState } from "@/store/store"
+import { useDispatch, useSelector } from "react-redux"
 
 const NAV_LINKS = [
   { to: "/", label: "Home" },
@@ -13,9 +16,18 @@ const NAV_LINKS = [
 ]
 
 export function Header() {
+  const token = useSelector((state: RootState) => state.auth.token)
   const { theme, toggleTheme } = useTheme()
   const [mobileOpen, setMobileOpen] = useState(false)
+  const navigate = useNavigate()
+  const dispatch = useDispatch<AppDispatch>()
 
+
+
+  const handleLogout = () => {
+    dispatch(logout())
+    navigate(ROUTES.SIGN_IN, { replace: true })
+  }
   return (
     <motion.header
       initial={{ y: -24, opacity: 0 }}
@@ -72,21 +84,32 @@ export function Header() {
               )}
             </AnimatePresence>
           </motion.button>
+          {
+            token ? (
+              <Button asChild variant="outline" size="sm" className="flex-1" onClick={handleLogout}>
+                Log out
+              </Button>
+            ) :
+              (
+                <>
 
-          <Button asChild variant="outline" size="sm" className="flex-1">
-            <Link to={ROUTES.SIGN_IN} onClick={() => setMobileOpen(false)}>
-              Sign in
-            </Link>
-          </Button>
-          <Button
-            asChild
-            size="sm"
-            className="flex-1 bg-gradient-brand text-white"
-          >
-            <Link to={ROUTES.SIGN_UP} onClick={() => setMobileOpen(false)}>
-              Sign up
-            </Link>
-          </Button>
+                  <Button asChild variant="outline" size="sm" className="flex-1">
+                    <Link to={ROUTES.SIGN_IN} onClick={() => setMobileOpen(false)}>
+                      Sign in
+                    </Link>
+                  </Button>
+                  <Button
+                    asChild
+                    size="sm"
+                    className="flex-1 bg-gradient-brand text-white"
+                  >
+                    <Link to={ROUTES.SIGN_UP} onClick={() => setMobileOpen(false)}>
+                      Sign up
+                    </Link>
+                  </Button>
+                </>
+              )
+          }
 
           <button
             type="button"
@@ -143,6 +166,6 @@ export function Header() {
           </motion.div>
         )}
       </AnimatePresence>
-    </motion.header>
+    </motion.header >
   )
 }

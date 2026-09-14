@@ -32,7 +32,7 @@ const Header = ({ onMenuClick }: HeaderProps) => {
     return () => document.removeEventListener("mousedown", handleClickOutside)
   }, [])
 
-  function handleLogout() {
+  const handleLogout = () => {
     setMenuOpen(false)
     dispatch(logout())
     navigate(ROUTES.SIGN_IN, { replace: true })

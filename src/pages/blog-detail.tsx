@@ -1,31 +1,84 @@
-import { Heart } from "lucide-react"
+import { Heart, Loader2, Trash2 } from "lucide-react"
 import { useState, type FormEvent } from "react"
-import { Link, useParams } from "react-router-dom"
+import { useSelector } from "react-redux"
+import { Link, useNavigate, useParams } from "react-router-dom"
 import { toast } from "sonner"
 
 import { useGetPublicBlogByIdQuery } from "@/api/blog.api"
+import { useCreateCommentMutation, useDeleteCommentMutation, useGetCommentsQuery } from "@/api/comment.api"
+import { useLikeBlogMutation, useUnlikeBlogMutation } from "@/api/like.api"
 import { Button } from "@/components/ui/button"
 import { Loading } from "@/components/ui/loading"
 import { Textarea } from "@/components/ui/textarea"
 import { formatDate } from "@/constants"
 import { ROUTES } from "@/constants/routes"
+import { getApiErrorMessage } from "@/lib/apiError"
+import type { RootState } from "@/store/store"
 
 const BlogDetail = () => {
     const { id } = useParams<{ id: string }>()
     const blogId = Number(id)
+    const navigate = useNavigate()
+
+    const currentUser = useSelector((state: RootState) => state.auth.user)
+    const token = useSelector((state: RootState) => state.auth.token)
+
     const { data, isLoading, isFetching, isError } = useGetPublicBlogByIdQuery(blogId, {
         skip: !blogId,
     })
     const blog = data
 
+    const { data: comments, isLoading: isLoadingComments } = useGetCommentsQuery(blogId, {
+        skip: !blogId,
+    })
+
+    const [likeBlog, { isLoading: isLiking }] = useLikeBlogMutation()
+    const [unlikeBlog, { isLoading: isUnliking }] = useUnlikeBlogMutation()
+    const [createComment, { isLoading: isPostingComment }] = useCreateCommentMutation()
+    const [deleteComment] = useDeleteCommentMutation()
+
     const [liked, setLiked] = useState(false)
+    const [totalLikes, setTotalLikes] = useState<number | null>(null)
     const [comment, setComment] = useState("")
 
-    function handleCommentSubmit(event: FormEvent<HTMLFormElement>) {
+    function requireAuth() {
+        if (token) return true
+        toast.error("Please sign in to continue")
+        navigate(ROUTES.SIGN_IN)
+        return false
+    }
+
+    async function handleToggleLike() {
+        if (!requireAuth()) return
+        try {
+            const result = liked ? await unlikeBlog(blogId).unwrap() : await likeBlog(blogId).unwrap()
+            setLiked(!liked)
+            setTotalLikes(result.total_likes)
+        } catch (error) {
+            toast.error(getApiErrorMessage(error))
+        }
+    }
+
+    async function handleCommentSubmit(event: FormEvent<HTMLFormElement>) {
         event.preventDefault()
         if (!comment.trim()) return
-        toast.info("Comments are coming soon")
-        setComment("")
+        if (!requireAuth()) return
+
+        try {
+            await createComment({ blogId, content: comment.trim() }).unwrap()
+            setComment("")
+        } catch (error) {
+            toast.error(getApiErrorMessage(error))
+        }
+    }
+
+    async function handleDeleteComment(commentId: number) {
+        try {
+            await deleteComment({ commentId, blogId }).unwrap()
+            toast.success("Comment deleted")
+        } catch (error) {
+            toast.error(getApiErrorMessage(error))
+        }
     }
 
     if (isLoading || isFetching) {
@@ -78,17 +131,59 @@ const BlogDetail = () => {
                     type="button"
                     variant={liked ? "default" : "outline"}
                     size="sm"
-                    onClick={() => setLiked((prev) => !prev)}
+                    disabled={isLiking || isUnliking}
+                    onClick={handleToggleLike}
                 >
-                    <Heart className={liked ? "fill-current" : ""} />
+                    {isLiking || isUnliking ? (
+                        <Loader2 className="animate-spin" />
+                    ) : (
+                        <Heart className={liked ? "fill-current" : ""} />
+                    )}
                     {liked ? "Liked" : "Like"}
                 </Button>
+                {totalLikes !== null && (
+                    <span className="text-sm text-muted-foreground">
+                        {totalLikes} {totalLikes === 1 ? "like" : "likes"}
+                    </span>
+                )}
             </div>
 
             <div className="flex flex-col gap-4">
                 <h2 className="text-lg font-semibold text-foreground">Comments</h2>
 
-                <p className="text-sm text-muted-foreground">No comments yet.</p>
+                {isLoadingComments ? (
+                    <p className="text-sm text-muted-foreground">Loading comments…</p>
+                ) : comments && comments.length > 0 ? (
+                    <ul className="flex flex-col gap-3">
+                        {comments.map((item) => (
+                            <li
+                                key={item.id}
+                                className="flex flex-col gap-1 rounded-lg border border-border/60 p-3"
+                            >
+                                <div className="flex items-center justify-between gap-2">
+                                    <span className="text-xs font-medium text-muted-foreground">
+                                        {currentUser?.id === item.user_id ? "You" : `User #${item.user_id}`}
+                                        {" · "}
+                                        {formatDate(item.created_at)}
+                                    </span>
+                                    {currentUser?.id === item.user_id && (
+                                        <button
+                                            type="button"
+                                            aria-label="Delete comment"
+                                            className="text-muted-foreground transition-colors hover:text-destructive"
+                                            onClick={() => handleDeleteComment(item.id)}
+                                        >
+                                            <Trash2 className="size-3.5" />
+                                        </button>
+                                    )}
+                                </div>
+                                <p className="text-sm text-foreground">{item.content}</p>
+                            </li>
+                        ))}
+                    </ul>
+                ) : (
+                    <p className="text-sm text-muted-foreground">No comments yet.</p>
+                )}
 
                 <form onSubmit={handleCommentSubmit} className="flex flex-col gap-2">
                     <Textarea
@@ -97,7 +192,8 @@ const BlogDetail = () => {
                         value={comment}
                         onChange={(event) => setComment(event.target.value)}
                     />
-                    <Button type="submit" size="sm" className="self-end">
+                    <Button type="submit" size="sm" className="self-end" disabled={isPostingComment}>
+                        {isPostingComment && <Loader2 className="animate-spin" />}
                         Post comment
                     </Button>
                 </form>
