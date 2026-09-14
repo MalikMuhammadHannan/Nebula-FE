@@ -1,5 +1,13 @@
-import { Loader2, Plus, SendHorizontal, Upload } from "lucide-react"
-import { useEffect, useRef, useState, type ChangeEvent, type FormEvent, type KeyboardEvent } from "react"
+import { ArrowDown, Loader2, Plus, SendHorizontal, Upload } from "lucide-react"
+import {
+  useEffect,
+  useRef,
+  useState,
+  type ChangeEvent,
+  type FormEvent,
+  type KeyboardEvent,
+  type UIEvent,
+} from "react"
 import { toast } from "sonner"
 
 import {
@@ -16,6 +24,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import ConfirmationModal from "@/components/ui/DeleteConfirmationModal"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import Shimmer from "@/components/ui/Shimmer"
 import { Textarea } from "@/components/ui/textarea"
 import { formatDate } from "@/constants"
 import { getApiErrorMessage } from "@/lib/apiError"
@@ -27,7 +36,10 @@ const DocumentBlogs = () => {
   const [query, setQuery] = useState("")
   const [pendingQuery, setPendingQuery] = useState<string | null>(null)
   const [deleteTarget, setDeleteTarget] = useState<DocumentSession | null>(null)
+  const [showScrollButton, setShowScrollButton] = useState(false)
+  const containerRef = useRef<HTMLDivElement>(null)
   const bottomRef = useRef<HTMLDivElement>(null)
+  const isAtBottomRef = useRef(true)
 
   const { data: sessions, isLoading: isLoadingSessions } = useGetAllSessionsQuery()
   const { data: history, isLoading: isLoadingHistory } = useGetChatHistoryQuery(sessionId ?? "", {
@@ -38,11 +50,28 @@ const DocumentBlogs = () => {
   const [deleteSession, { isLoading: isDeleting }] = useDeleteSessionMutation()
 
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: "smooth" })
+    if (isAtBottomRef.current) {
+      bottomRef.current?.scrollIntoView({ behavior: "smooth" })
+    }
   }, [history, pendingQuery])
+
+  function scrollToBottom() {
+    isAtBottomRef.current = true
+    setShowScrollButton(false)
+    bottomRef.current?.scrollIntoView({ behavior: "smooth" })
+  }
+
+  function handleScroll(event: UIEvent<HTMLDivElement>) {
+    const el = event.currentTarget
+    const atBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 80
+    isAtBottomRef.current = atBottom
+    setShowScrollButton(!atBottom)
+  }
 
   function handleSelectSession(session_id: string) {
     setSessionId(session_id)
+    isAtBottomRef.current = true
+    setShowScrollButton(false)
   }
 
   function handleNewChat() {
@@ -50,6 +79,8 @@ const DocumentBlogs = () => {
     setFile(null)
     setQuery("")
     setPendingQuery(null)
+    isAtBottomRef.current = true
+    setShowScrollButton(false)
   }
 
   async function handleDeleteSession() {
@@ -92,6 +123,7 @@ const DocumentBlogs = () => {
 
     setQuery("")
     setPendingQuery(trimmed)
+    scrollToBottom()
     try {
       await queryDocument({ session_id: sessionId, query: trimmed }).unwrap()
     } catch (error) {
@@ -110,7 +142,7 @@ const DocumentBlogs = () => {
   }
 
   return (
-    <div className="flex h-[calc(100svh-8rem)] gap-6">
+    <div className="flex h-[calc(100svh-7rem)] gap-6">
       <Card className="flex h-full w-64 shrink-0 flex-col">
         <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle>Sessions</CardTitle>
@@ -119,9 +151,11 @@ const DocumentBlogs = () => {
             New
           </Button>
         </CardHeader>
-        <CardContent className="flex flex-1 flex-col gap-1 overflow-y-auto">
+        <CardContent className="flex flex-1 flex-col gap-1 overflow-y-auto scroll-container">
           {isLoadingSessions ? (
-            <p className="text-xs text-muted-foreground">Loading…</p>
+            Array.from({ length: 5 }, (_, index) => (
+              <Shimmer key={index} className="h-14" height={55} />
+            ))
           ) : !sessions?.length ? (
             <p className="text-xs text-muted-foreground">No documents uploaded yet.</p>
           ) : (
@@ -129,7 +163,7 @@ const DocumentBlogs = () => {
               <div
                 key={session.session_id}
                 className={cn(
-                  "flex items-center gap-1 rounded-lg pr-1 transition-colors hover:bg-muted",
+                  "flex items-center gap-1 rounded-lg pr-1 cursor-pointer transition-colors hover:bg-muted",
                   sessionId === session.session_id && "bg-muted"
                 )}
               >
@@ -180,64 +214,81 @@ const DocumentBlogs = () => {
           </CardContent>
         ) : (
           <>
-            <CardContent className="flex flex-1 flex-col gap-4 overflow-y-auto">
-              {isLoadingHistory ? (
-                <p className="text-center text-sm text-muted-foreground">Loading conversation…</p>
-              ) : !history?.length && !pendingQuery ? (
-                <p className="text-center text-sm text-muted-foreground">
-                  Ask a question about your document to get started.
-                </p>
-              ) : (
-                history?.map((turn) => (
-                  <div key={turn.id} className="flex flex-col gap-2">
+            <div className="relative flex min-h-0 flex-1 flex-col">
+              <CardContent
+                ref={containerRef}
+                onScroll={handleScroll}
+                className="flex flex-1 flex-col gap-4 overflow-y-auto scroll-container"
+              >
+                {isLoadingHistory ? (
+                  <p className="text-center text-sm text-muted-foreground">Loading conversation…</p>
+                ) : !history?.length && !pendingQuery ? (
+                  <p className="text-center text-sm text-muted-foreground">
+                    Ask a question about your document to get started.
+                  </p>
+                ) : (
+                  history?.map((turn) => (
+                    <div key={turn.id} className="flex flex-col gap-2 ">
+                      <div className="flex justify-end">
+                        <div className="max-w-[75%] rounded-2xl rounded-br-sm bg-primary px-3.5 py-2 text-sm text-primary-foreground">
+                          {turn.query}
+                        </div>
+                      </div>
+                      <div className="flex justify-start">
+                        {turn.blogs.length > 0 ? (
+                          <div className="flex max-w-[75%] flex-col gap-1 rounded-2xl rounded-bl-sm bg-muted px-3.5 py-2.5">
+                            <p className="text-sm font-semibold text-foreground">{turn.blogs[0].title}</p>
+                            <p className="text-xs text-muted-foreground">{turn.blogs[0].description}</p>
+                            <p className="whitespace-pre-wrap text-sm text-foreground">
+                              {turn.blogs[0].content}
+                            </p>
+                          </div>
+                        ) : (
+                          <div className="max-w-[75%] rounded-2xl rounded-bl-sm bg-muted px-3.5 py-2 text-sm text-muted-foreground italic">
+                            No answer found in the document for this question.
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  ))
+                )}
+
+                {pendingQuery && (
+                  <div className="flex flex-col gap-2">
                     <div className="flex justify-end">
                       <div className="max-w-[75%] rounded-2xl rounded-br-sm bg-primary px-3.5 py-2 text-sm text-primary-foreground">
-                        {turn.query}
+                        {pendingQuery}
                       </div>
                     </div>
                     <div className="flex justify-start">
-                      {turn.blogs.length > 0 ? (
-                        <div className="flex max-w-[75%] flex-col gap-1 rounded-2xl rounded-bl-sm bg-muted px-3.5 py-2.5">
-                          <p className="text-sm font-semibold text-foreground">{turn.blogs[0].title}</p>
-                          <p className="text-xs text-muted-foreground">{turn.blogs[0].description}</p>
-                          <p className="whitespace-pre-wrap text-sm text-foreground">
-                            {turn.blogs[0].content}
-                          </p>
-                        </div>
-                      ) : (
-                        <div className="max-w-[75%] rounded-2xl rounded-bl-sm bg-muted px-3.5 py-2 text-sm text-muted-foreground italic">
-                          No answer found in the document for this question.
-                        </div>
-                      )}
+                      <div className="flex items-center gap-2 rounded-2xl rounded-bl-sm bg-muted px-3.5 py-2.5 text-sm text-muted-foreground">
+                        <Loader2 className="size-3.5 animate-spin" />
+                        Thinking…
+                      </div>
                     </div>
                   </div>
-                ))
-              )}
+                )}
 
-              {pendingQuery && (
-                <div className="flex flex-col gap-2">
-                  <div className="flex justify-end">
-                    <div className="max-w-[75%] rounded-2xl rounded-br-sm bg-primary px-3.5 py-2 text-sm text-primary-foreground">
-                      {pendingQuery}
-                    </div>
-                  </div>
-                  <div className="flex justify-start">
-                    <div className="flex items-center gap-2 rounded-2xl rounded-bl-sm bg-muted px-3.5 py-2.5 text-sm text-muted-foreground">
-                      <Loader2 className="size-3.5 animate-spin" />
-                      Thinking…
-                    </div>
-                  </div>
-                </div>
-              )}
+                <div ref={bottomRef} />
+              </CardContent>
 
-              <div ref={bottomRef} />
-            </CardContent>
+              {showScrollButton && (
+                <button
+                  type="button"
+                  onClick={scrollToBottom}
+                  aria-label="Scroll to latest message"
+                  className="absolute bottom-4 right-1/2 cursor-pointer flex size-9 items-center justify-center rounded-full bg-background text-foreground shadow-md ring-1 ring-border/60 transition-colors hover:bg-muted"
+                >
+                  <ArrowDown className="size-4" />
+                </button>
+              )}
+            </div>
 
             <div className="border-t border-border/60 p-4">
               <form onSubmit={handleQuery} className="flex items-end gap-2">
                 <Textarea
                   rows={1}
-                  className="max-h-32 flex-1 resize-none"
+                  className="max-h-32 flex-1 resize-none "
                   placeholder="Ask about your document…"
                   value={query}
                   onChange={(event) => setQuery(event.target.value)}
