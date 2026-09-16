@@ -4,6 +4,7 @@ import {
     FileText,
     LayoutDashboard,
     Sparkles,
+    Users,
     UserRound,
 } from "lucide-react";
 import React from "react";
@@ -42,8 +43,8 @@ const Blogs = React.lazy(
 const Profile = React.lazy(
     () => import("@/pages/profile")
 );
-const BlogDetail = React.lazy(
-    () => import("@/pages/blog-detail")
+const AdminUsers = React.lazy(
+    () => import("@/pages/admin-users")
 );
 
 
@@ -100,6 +101,16 @@ export const appRoutes: AppRoute[] = [
             group: "account",
         },
         roles: ["EDITOR", "ADMIN", "USER"],
+    },
+    {
+        path: ROUTES.ADMIN_USERS,
+        element: AdminUsers,
+        sidebar: {
+            icon: <Users size={20} />,
+            label: "Admin Users",
+            group: "admin",
+        },
+        roles: ["ADMIN"],
     },
 
 ];

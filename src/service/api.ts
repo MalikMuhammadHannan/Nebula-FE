@@ -18,6 +18,7 @@ export const RtkQueryTags = {
     BLOG: "blog",
     DOCUMENT: "document",
     COMMENT: "comment",
+    USER: "user",
 }
 
 
