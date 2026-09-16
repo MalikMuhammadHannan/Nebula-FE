@@ -47,7 +47,7 @@ function SideBarContent({ onNavigate, collapsed }: SideBarContentProps) {
   return (
     <div className="flex h-full flex-col gap-6 overflow-y-auto px-3 py-5">
       <NavLink
-        to={ROUTES.DASHBOARD}
+        to={ROUTES.LANDING}
         onClick={onNavigate}
         className={cn(
           "flex items-center gap-2 px-2 text-lg font-semibold tracking-tight",

@@ -86,9 +86,14 @@ export function Header() {
           </motion.button>
           {
             token ? (
-              <Button asChild variant="outline" size="sm" className="flex-1" onClick={handleLogout}>
-                Log out
-              </Button>
+              <div className="flex gap-2">
+                <Button asChild variant="outline" size="sm" className="flex-1" onClick={handleLogout}>
+                  Log out
+                </Button>
+                <Button asChild size="sm" className="flex-1" onClick={() => navigate(ROUTES.DASHBOARD)}>
+                  Dashboard
+                </Button>
+              </div>
             ) :
               (
                 <>
