@@ -1,6 +1,7 @@
 import type { Blog } from "@/api/blog.api"
 import { Modal } from "@/components/ui/Modal"
 import { formatDate } from "@/constants"
+import { stripHtml } from "@/lib/html"
 
 interface ViewBlogProps {
   isOpen: boolean
@@ -17,19 +18,19 @@ const ViewBlog = ({ isOpen, onClose, blog }: ViewBlogProps) => {
         {blog.image_url && (
           <img
             src={blog.image_url}
-            alt={blog.title}
+            alt={stripHtml(blog.title)}
             className="max-h-64 w-full rounded-lg object-cover"
           />
         )}
 
         <div>
           <p className="text-xs font-medium text-muted-foreground">Title</p>
-          <h3 className="text-lg font-semibold text-foreground">{blog.title}</h3>
+          <h3 className="text-lg font-semibold text-foreground">{stripHtml(blog.title)}</h3>
         </div>
 
         <div>
           <p className="text-xs font-medium text-muted-foreground">Description</p>
-          <p className="whitespace-pre-wrap text-sm text-foreground">{blog.description}</p>
+          <p className="whitespace-pre-wrap text-sm text-foreground">{stripHtml(blog.description)}</p>
         </div>
 
         <div className="flex gap-6">

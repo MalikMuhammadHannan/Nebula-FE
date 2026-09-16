@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button"
 import { TableStructure, type Column } from "@/components/ui/TableStructure"
 import { formatDate } from "@/constants"
 import { getApiErrorMessage } from "@/lib/apiError"
+import { stripHtml } from "@/lib/html"
 import type { RootState } from "@/store/store"
 import AddEditBlog from "@/components/modals/add-edit-blog"
 import ViewBlog from "@/components/modals/view-blog"
@@ -96,6 +97,7 @@ const Blogs = () => {
       dataIndex: "title",
       width: "220px",
       tooltip: true,
+      render: (value) => stripHtml(value as string),
     },
     {
       key: "description",
@@ -103,6 +105,7 @@ const Blogs = () => {
       dataIndex: "description",
       width: "320px",
       tooltip: true,
+      render: (value) => stripHtml(value as string),
     },
     {
       key: "created_at",

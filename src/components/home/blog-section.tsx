@@ -2,6 +2,7 @@ import { motion } from "motion/react"
 
 import { useGetPublicBlogsQuery } from "@/api/blog.api"
 import { BlogCard } from "@/components/home/blog-card"
+import Shimmer from "../ui/Shimmer"
 
 export function BlogSection() {
   const { data: posts, isLoading, isError } = useGetPublicBlogsQuery()
@@ -22,7 +23,11 @@ export function BlogSection() {
       </motion.div>
 
       {isLoading ? (
-        <p className="text-center text-muted-foreground">Loading posts…</p>
+        <div className="text-center flex gap-3 text-muted-foreground">{
+          Array.from({ length: 3 }).map((_, index) => (
+            <Shimmer key={index} height={500} />
+          ))
+        }</div>
       ) : isError ? (
         <p className="text-center text-muted-foreground">Couldn't load posts. Please try again later.</p>
       ) : !posts?.length ? (

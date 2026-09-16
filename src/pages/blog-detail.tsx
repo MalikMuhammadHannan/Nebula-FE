@@ -13,6 +13,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { formatDate } from "@/constants"
 import { ROUTES } from "@/constants/routes"
 import { getApiErrorMessage } from "@/lib/apiError"
+import { sanitizeHtml, stripHtml } from "@/lib/html"
 import type { RootState } from "@/store/store"
 
 const BlogDetail = () => {
@@ -106,7 +107,7 @@ const BlogDetail = () => {
                 <div className="aspect-video overflow-hidden rounded-2xl">
                     <img
                         src={blog.image_url}
-                        alt={blog.title}
+                        alt={stripHtml(blog.title)}
                         className="size-full object-cover"
                     />
                 </div>
@@ -117,14 +118,15 @@ const BlogDetail = () => {
                     {formatDate(blog.created_at)}
                 </p>
                 <h1 className="font-heading text-2xl font-semibold text-foreground sm:text-3xl">
-                    {blog.title}
+                    {stripHtml(blog.title)}
                 </h1>
-                <p className="text-muted-foreground">{blog.description}</p>
+                <p className="text-muted-foreground">{stripHtml(blog.description)}</p>
             </div>
 
-            <div className="whitespace-pre-wrap text-sm leading-relaxed text-foreground">
-                {blog.content}
-            </div>
+            <div
+                className="text-sm leading-relaxed text-foreground [&_a]:text-gradient-brand [&_blockquote]:border-l-2 [&_blockquote]:border-border [&_blockquote]:pl-4 [&_blockquote]:italic [&_h1]:text-xl [&_h1]:font-semibold [&_h2]:text-lg [&_h2]:font-semibold [&_h3]:text-base [&_h3]:font-semibold [&_ol]:list-decimal [&_ol]:pl-5 [&_p]:mb-3 [&_ul]:list-disc [&_ul]:pl-5"
+                dangerouslySetInnerHTML={{ __html: sanitizeHtml(blog.content) }}
+            />
 
             <div className="flex items-center gap-3 border-y border-border/60 py-4">
                 <Button

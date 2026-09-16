@@ -4,6 +4,7 @@ import { Link } from "react-router-dom"
 import type { Blog } from "@/api/blog.api"
 import { formatDate } from "@/constants";
 import { ROUTES } from "@/constants/routes"
+import { stripHtml } from "@/lib/html"
 
 export function BlogCard({ post, index = 0 }: { post: Blog; index?: number }) {
   return (
@@ -20,7 +21,7 @@ export function BlogCard({ post, index = 0 }: { post: Blog; index?: number }) {
           <div className="relative aspect-[16/10] overflow-hidden">
             <img
               src={post.image_url}
-              alt={post.title}
+              alt={stripHtml(post.title)}
               loading="lazy"
               className="size-full object-cover transition-transform duration-500 group-hover:scale-105"
             />
@@ -32,10 +33,10 @@ export function BlogCard({ post, index = 0 }: { post: Blog; index?: number }) {
             {formatDate(post.created_at)}
           </p>
           <h3 className="text-lg leading-snug font-semibold text-foreground">
-            {post.title}
+            {stripHtml(post.title)}
           </h3>
           <p className="line-clamp-3 text-sm text-muted-foreground">
-            {post.description}
+            {stripHtml(post.description)}
           </p>
           <span className="mt-2 text-sm font-medium text-gradient-brand">
             Read more →
