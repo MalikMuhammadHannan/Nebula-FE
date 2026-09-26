@@ -5,14 +5,16 @@ import { toast } from "sonner"
 import { useGenerateAiBlogMutation } from "@/api/ai-blog.api"
 import type { Blog } from "@/api/blog.api"
 import { BlogCard } from "@/components/home/blog-card"
+import BuyTokensModal from "@/components/modals/buy-tokens"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Textarea } from "@/components/ui/textarea"
-import { getApiErrorMessage } from "@/lib/apiError"
+import { getApiErrorMessage, isInsufficientTokensError } from "@/lib/apiError"
 
 const AiBlogs = () => {
   const [query, setQuery] = useState("")
   const [generatedBlogs, setGeneratedBlogs] = useState<Blog[]>([])
+  const [buyTokensOpen, setBuyTokensOpen] = useState(false)
   const [generateAiBlog, { isLoading }] = useGenerateAiBlogMutation()
 
   async function handleGenerate(event: FormEvent<HTMLFormElement>) {
@@ -27,6 +29,9 @@ const AiBlogs = () => {
       toast.success("Blog generated successfully")
     } catch (error) {
       toast.error(getApiErrorMessage(error))
+      if (isInsufficientTokensError(error)) {
+        setBuyTokensOpen(true)
+      }
     }
   }
 
@@ -87,6 +92,8 @@ const AiBlogs = () => {
           </div>
         )
       )}
+
+      <BuyTokensModal isOpen={buyTokensOpen} onClose={() => setBuyTokensOpen(false)} />
     </div>
   )
 }

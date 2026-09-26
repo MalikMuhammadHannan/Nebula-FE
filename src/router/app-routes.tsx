@@ -46,6 +46,12 @@ const Profile = React.lazy(
 const AdminUsers = React.lazy(
     () => import("@/pages/admin-users")
 );
+const BillingSuccess = React.lazy(
+    () => import("@/pages/billing-success")
+);
+const BillingCancel = React.lazy(
+    () => import("@/pages/billing-cancel")
+);
 
 
 export const appRoutes: AppRoute[] = [
@@ -111,6 +117,14 @@ export const appRoutes: AppRoute[] = [
             group: "admin",
         },
         roles: ["ADMIN"],
+    },
+    {
+        path: ROUTES.BILLING_SUCCESS,
+        element: BillingSuccess,
+    },
+    {
+        path: ROUTES.BILLING_CANCEL,
+        element: BillingCancel,
     },
 
 ];

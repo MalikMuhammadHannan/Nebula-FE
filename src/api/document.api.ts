@@ -41,6 +41,7 @@ export const documentApi = api.injectEndpoints({
             }),
             invalidatesTags: (_result, _error, { session_id }) => [
                 { type: RtkQueryTags.DOCUMENT, id: session_id },
+                RtkQueryTags.BILLING,
             ],
         }),
         getAllSessions: builder.query<DocumentSession[], void>({

@@ -19,6 +19,7 @@ import {
   type DocumentSession,
 } from "@/api/document.api"
 import ActionButton from "@/components/ui/ActionButton"
+import BuyTokensModal from "@/components/modals/buy-tokens"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import ConfirmationModal from "@/components/ui/DeleteConfirmationModal"
@@ -27,7 +28,7 @@ import { Label } from "@/components/ui/label"
 import Shimmer from "@/components/ui/Shimmer"
 import { Textarea } from "@/components/ui/textarea"
 import { formatDate } from "@/constants"
-import { getApiErrorMessage } from "@/lib/apiError"
+import { getApiErrorMessage, isInsufficientTokensError } from "@/lib/apiError"
 import { cn } from "@/lib/utils"
 
 const DocumentBlogs = () => {
@@ -36,6 +37,7 @@ const DocumentBlogs = () => {
   const [query, setQuery] = useState("")
   const [pendingQuery, setPendingQuery] = useState<string | null>(null)
   const [deleteTarget, setDeleteTarget] = useState<DocumentSession | null>(null)
+  const [buyTokensOpen, setBuyTokensOpen] = useState(false)
   const [showScrollButton, setShowScrollButton] = useState(false)
   const containerRef = useRef<HTMLDivElement>(null)
   const bottomRef = useRef<HTMLDivElement>(null)
@@ -129,6 +131,9 @@ const DocumentBlogs = () => {
     } catch (error) {
       toast.error(getApiErrorMessage(error))
       setQuery(trimmed)
+      if (isInsufficientTokensError(error)) {
+        setBuyTokensOpen(true)
+      }
     } finally {
       setPendingQuery(null)
     }
@@ -317,6 +322,8 @@ const DocumentBlogs = () => {
         label={deleteTarget ? `Delete "${deleteTarget.filename}"?` : undefined}
         description="This action cannot be undone."
       />
+
+      <BuyTokensModal isOpen={buyTokensOpen} onClose={() => setBuyTokensOpen(false)} />
     </div>
   )
 }

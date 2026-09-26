@@ -28,3 +28,7 @@ export function getApiErrorMessage(
 
   return fallback;
 }
+
+export function isInsufficientTokensError(err: any) {
+  return err?.status === 402;
+}

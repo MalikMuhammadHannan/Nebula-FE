@@ -1,9 +1,11 @@
-import { LogOut, Menu, Moon, Sun } from "lucide-react"
+import { Coins, LogOut, Menu, Moon, Sun } from "lucide-react"
 import { AnimatePresence, motion } from "motion/react"
 import { useEffect, useRef, useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import { useNavigate } from "react-router-dom"
 
+import { useGetTokenBalanceQuery } from "@/api/billing.api"
+import BuyTokensModal from "@/components/modals/buy-tokens"
 import { ROUTES } from "@/constants/routes"
 import { useTheme } from "@/hooks/use-theme"
 import { logout } from "@/store/reducers/authReducer.slice"
@@ -19,7 +21,10 @@ const Header = ({ onMenuClick }: HeaderProps) => {
   const dispatch = useDispatch<AppDispatch>()
   const navigate = useNavigate()
 
+  const { data: tokenBalance } = useGetTokenBalanceQuery()
+
   const [menuOpen, setMenuOpen] = useState(false)
+  const [buyTokensOpen, setBuyTokensOpen] = useState(false)
   const menuRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -54,6 +59,17 @@ const Header = ({ onMenuClick }: HeaderProps) => {
       <div className="hidden md:block" />
 
       <div className="flex items-center gap-2">
+        {tokenBalance && (
+          <button
+            type="button"
+            onClick={() => setBuyTokensOpen(true)}
+            className="flex h-8 items-center gap-1.5 rounded-lg border border-border px-2.5 text-xs font-medium text-muted-foreground transition-colors hover:text-foreground"
+          >
+            <Coins className="size-3.5" />
+            {tokenBalance.token_balance.toLocaleString()}
+          </button>
+        )}
+
         <motion.button
           type="button"
           onClick={toggleTheme}
@@ -124,6 +140,8 @@ const Header = ({ onMenuClick }: HeaderProps) => {
           </AnimatePresence>
         </div>
       </div>
+
+      <BuyTokensModal isOpen={buyTokensOpen} onClose={() => setBuyTokensOpen(false)} />
     </header>
   )
 }

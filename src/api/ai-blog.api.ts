@@ -14,7 +14,7 @@ export const aiBlogApi = api.injectEndpoints({
                 method: API_METHODS.POST,
                 body,
             }),
-            invalidatesTags: [RtkQueryTags.BLOG],
+            invalidatesTags: [RtkQueryTags.BLOG, RtkQueryTags.BILLING],
         }),
     }),
 });

@@ -20,6 +20,8 @@ export const ROUTES = {
 
     SUBSCRIPTION: "/dashboard/subscription",
     BILLING: "/dashboard/billing",
+    BILLING_SUCCESS: "/billing/success",
+    BILLING_CANCEL: "/billing/cancel",
 
     HISTORY: "/dashboard/history",
 
