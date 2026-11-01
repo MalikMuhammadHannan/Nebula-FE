@@ -27,14 +27,14 @@ export function Pagination({
   return (
     <div className="flex flex-wrap gap-4 items-center justify-between">
       <div className="flex items-center space-x-2">
-        <span className="text-sm text-gray-700">Show:</span>
+        <span className="text-sm text-muted-foreground">Show:</span>
         <select
           value={itemsPerPage}
           onChange={(e) => {
             onItemsPerPageChange(Number(e.target.value));
             onPageChange(1);
           }}
-          className="border border-gray-300 rounded px-2 py-1 text-sm"
+          className="border border-input bg-background text-foreground rounded px-2 py-1 text-sm"
         >
           <option value={5}>5</option>
           <option value={10}>10</option>
@@ -46,11 +46,11 @@ export function Pagination({
           <option value={1000}>1000</option>
           <option value={2000}>2000</option>
         </select>
-        <span className="text-sm text-gray-700">entries</span>
+        <span className="text-sm text-muted-foreground">entries</span>
       </div>
 
       <div className="flex flex-wrap gap-4 items-center space-x-2">
-        <span className="text-sm text-gray-700">
+        <span className="text-sm text-muted-foreground">
           Showing {startIndex + 1} to {Math.min(endIndex, totalItems)} of{" "}
           {totalItems} results
         </span>
@@ -73,7 +73,7 @@ export function Pagination({
             .map((page, index, array) => (
               <div key={page} className="flex items-center">
                 {index > 0 && array[index - 1] !== page - 1 && (
-                  <span className="px-2 text-gray-500">...</span>
+                  <span className="px-2 text-muted-foreground">...</span>
                 )}
                 <Button
                   variant={currentPage === page ? "default" : "outlineLight"}

@@ -34,7 +34,7 @@ export function AuthCard({ title, subtitle, children, footer }: AuthCardProps) {
           >
             N
           </motion.span>
-          <h1 className="m-0 text-xl font-semibold">{title}</h1>
+          <h1 className="m-0 !text-3xl font-semibold">{title}</h1>
           <p className="mt-1 text-sm text-muted-foreground">{subtitle}</p>
         </div>
 

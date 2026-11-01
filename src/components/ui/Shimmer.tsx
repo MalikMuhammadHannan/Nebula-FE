@@ -13,10 +13,10 @@ const Shimmer: React.FC<ShimmerProps> = ({
   const w = typeof width === "number" ? `${width}px` : width;
   return (
     <div
-      className={`relative w-full h-full overflow-hidden bg-gray-200  rounded-lg ${className}`}
+      className={`relative w-full h-full overflow-hidden bg-muted rounded-lg ${className}`}
       style={{ height: h, width: w }}
     >
-      <div className="absolute inset-0 -translate-x-full animate-[shimmer_1.5s_infinite] bg-gradient-to-r from-transparent via-white/60 to-transparent" />
+      <div className="absolute inset-0 -translate-x-full animate-[shimmer_1.5s_infinite] bg-gradient-to-r from-transparent via-white/60 dark:via-white/10 to-transparent" />
       <style>{`
         @keyframes shimmer {
           100% { transform: translateX(100%); }

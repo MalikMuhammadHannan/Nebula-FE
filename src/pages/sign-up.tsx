@@ -128,6 +128,7 @@ const SignUp = () => {
           <Button
             type="submit"
             size="lg"
+            showArrow
             disabled={isSigningUp}
             className="mt-2 bg-gradient-brand text-white hover:opacity-90"
           >

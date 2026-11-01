@@ -90,7 +90,7 @@ export function TableStructure<T>({
     <>
       <div className={`w-full max-w-full `}>
         <div
-          className={`bg-white rounded-lg border border-neutral-200 overflow-hidden w-full`}
+          className={`bg-card rounded-lg border border-border overflow-hidden w-full`}
         >
           <div
             className={`
@@ -107,18 +107,18 @@ export function TableStructure<T>({
             `}
           >
             <table className="min-w-full w-full">
-              <thead className="bg-neutral-50 border-b border-neutral-200 sticky top-0 z-1">
+              <thead className="bg-muted border-b border-border sticky top-0 z-1">
                 <tr>
                   {columns.map((column) => (
                     <th
                       key={column.key}
                       onClick={column.sortable && onSort ? (e) => onSort(String(column.dataIndex), e) : undefined}
-                      className={`px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm font-semibold text-neutral-700 ${column.align === "center"
+                      className={`px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm font-semibold text-muted-foreground ${column.align === "center"
                         ? "text-center"
                         : column.align === "right"
                           ? "text-right"
                           : "text-left"
-                        } ${column.sortable ? "cursor-pointer select-none hover:bg-neutral-100" : ""}`}
+                        } ${column.sortable ? "cursor-pointer select-none hover:bg-muted/80" : ""}`}
                       style={{ width: column.width }}
                     >
                       <div className={`flex items-center gap-1 sm:gap-2 whitespace-nowrap ${column.align === "center" ? "justify-center" : column.align === "right" ? "justify-end" : ""}`}>
@@ -141,7 +141,7 @@ export function TableStructure<T>({
                                   <ArrowDown className="h-4 w-4 text-primary" />
                                 );
                               }
-                              return <ArrowUpDown className="h-4 w-4 text-gray-400" />;
+                              return <ArrowUpDown className="h-4 w-4 text-muted-foreground" />;
                             })()}
                           </span>
                         )}
@@ -150,7 +150,7 @@ export function TableStructure<T>({
                   ))}
                 </tr>
               </thead>
-              <tbody className="divide-y divide-neutral-200">
+              <tbody className="divide-y divide-border">
                 {loading ? (
                   [...Array(5)].map((_, rowIndex) => (
                     <tr key={`shimmer-${rowIndex}`}>
@@ -165,13 +165,13 @@ export function TableStructure<T>({
                   <tr>
                     <td
                       colSpan={columns.length + (selectable ? 1 : 0)}
-                      className="px-2 sm:px-4 py-4 sm:py-8 text-center text-neutral-500"
+                      className="px-2 sm:px-4 py-4 sm:py-8 text-center text-muted-foreground"
                     >
                       <div className="text-center flex flex-col items-center py-8 sm:py-16">
-                        <h3 className="text-base sm:text-lg font-semibold text-neutral-900 mb-2">
+                        <h3 className="text-base sm:text-lg font-semibold text-foreground mb-2">
                           {emptyText}
                         </h3>
-                        <p className="text-sm sm:text-base text-neutral-600">
+                        <p className="text-sm sm:text-base text-muted-foreground">
                           Try adjusting your search or filter criteria.
                         </p>
                       </div>
@@ -195,10 +195,10 @@ export function TableStructure<T>({
                       return (
                         <React.Fragment key={String(record[rowKey])}>
                           {showHeader && (
-                            <tr className="bg-neutral-100 hover:bg-neutral-100 border-b">
+                            <tr className="bg-muted hover:bg-muted border-b border-border">
                               <td
                                 colSpan={columns.length}
-                                className="px-2 sm:px-4 py-2 text-sm font-semibold text-neutral-700"
+                                className="px-2 sm:px-4 py-2 text-sm font-semibold text-foreground"
                               >
                                 {renderGroupHeader
                                   ? renderGroupHeader(
@@ -214,16 +214,16 @@ export function TableStructure<T>({
                           <tr
                             {...(rowProps ? rowProps(record) : {})}
                             className={`transition-colors duration-150 ${isDisabled
-                              ? "bg-gray-50 opacity-60"
+                              ? "bg-muted/50 opacity-60"
                               : isHighlighted
-                                ? "bg-red-50 hover:bg-red-100"
-                                : "hover:bg-neutral-50"
+                                ? "bg-destructive/10 hover:bg-destructive/15"
+                                : "hover:bg-muted/50"
                               } ${rowClassName ? rowClassName(record) : ""}`}
                           >
                             {columns.map((column) => (
                               <td
                                 key={column.key}
-                                className={`px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-neutral-900 whitespace-nowrap ${column.align === "center"
+                                className={`px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-foreground whitespace-nowrap ${column.align === "center"
                                   ? "text-center"
                                   : column.align === "right"
                                     ? "text-right"
@@ -273,7 +273,7 @@ export function TableStructure<T>({
           </div>
         </div>
         {pagination && Array.isArray(data) && data.length > 0 && (
-          <div className="mt-4 py-1 px-2 bg-white rounded-lg border border-neutral-200 overflow-visible w-full">
+          <div className="mt-4 py-1 px-2 bg-card rounded-lg border border-border overflow-visible w-full">
             <Pagination
               refreshData={refreshData}
               currentPage={pagination.currentPage}

@@ -14,8 +14,8 @@
   --brand-gradient: linear-gradient(135deg,
       var(--brand-1) 0%,
       var(--brand-2) 35%,
-      var(--brand-3) 70%,
-      var(--brand-4) 100%);
+      var(--brand-2) 70%,
+      var(--brand-1) 100%);
   --brand-glow: rgba(131, 28, 145, 0.25);
 
   --mono: "Montserrat", sans-serif;

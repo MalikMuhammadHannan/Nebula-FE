@@ -106,6 +106,7 @@ export function Header() {
                   <Button
                     asChild
                     size="sm"
+                    showArrow
                     className="flex-1 bg-gradient-brand text-white"
                   >
                     <Link to={ROUTES.SIGN_UP} onClick={() => setMobileOpen(false)}>

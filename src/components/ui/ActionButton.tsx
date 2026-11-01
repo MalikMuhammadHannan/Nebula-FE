@@ -30,7 +30,7 @@ const styles: Record<string, any> = {
     hoverColor: "hover:text-blue-700",
     border: "border-blue-500",
     hoverBorder: "hover:border-blue-600",
-    bg: "hover:bg-teal-50",
+    bg: "hover:bg-teal-500/10",
     icon: Eye,
   },
   edit: {
@@ -38,7 +38,7 @@ const styles: Record<string, any> = {
     hoverColor: "hover:text-teal-700",
     border: "border-teal-500",
     hoverBorder: "hover:border-teal-600",
-    bg: "hover:bg-teal-50",
+    bg: "hover:bg-teal-500/10",
     icon: Edit,
   },
   link: {
@@ -46,7 +46,7 @@ const styles: Record<string, any> = {
     hoverColor: "hover:text-blue-700",
     border: "border-blue-500",
     hoverBorder: "hover:border-blue-600",
-    bg: "hover:bg-blue-50",
+    bg: "hover:bg-blue-500/10",
     icon: Link2,
   },
   copy: {
@@ -54,7 +54,7 @@ const styles: Record<string, any> = {
     hoverColor: "hover:text-indigo-700",
     border: "border-indigo-500",
     hoverBorder: "hover:border-indigo-600",
-    bg: "hover:bg-indigo-50",
+    bg: "hover:bg-indigo-500/10",
     icon: CopyPlus,
   },
   delete: {
@@ -62,7 +62,7 @@ const styles: Record<string, any> = {
     hoverColor: "hover:text-red-700",
     border: "border-red-500",
     hoverBorder: "hover:border-red-600",
-    bg: "hover:bg-red-50",
+    bg: "hover:bg-red-500/10",
     icon: Trash,
   },
   download: {
@@ -70,7 +70,7 @@ const styles: Record<string, any> = {
     hoverColor: "hover:text-purple-700",
     border: "border-purple-500",
     hoverBorder: "hover:border-purple-600",
-    bg: "hover:bg-purple-50",
+    bg: "hover:bg-purple-500/10",
     icon: Download,
   },
   upload: {
@@ -78,7 +78,7 @@ const styles: Record<string, any> = {
     hoverColor: "hover:text-purple-700",
     border: "border-purple-500",
     hoverBorder: "hover:border-purple-600",
-    bg: "hover:bg-purple-50",
+    bg: "hover:bg-purple-500/10",
     icon: Upload,
   },
   save: {
@@ -86,7 +86,7 @@ const styles: Record<string, any> = {
     hoverColor: "hover:text-green-700",
     border: "border-green-500",
     hoverBorder: "hover:border-green-600",
-    bg: "hover:bg-green-50",
+    bg: "hover:bg-green-500/10",
     icon: Save,
   },
   cancel: {
@@ -94,7 +94,7 @@ const styles: Record<string, any> = {
     hoverColor: "hover:text-red-700",
     border: "border-red-500",
     hoverBorder: "hover:border-red-600",
-    bg: "hover:bg-red-50",
+    bg: "hover:bg-red-500/10",
     icon: CircleOff,
   },
   setting: {
@@ -102,7 +102,7 @@ const styles: Record<string, any> = {
     hoverColor: "hover:text-amber-700",
     border: "border-amber-500",
     hoverBorder: "hover:border-amber-600",
-    bg: "hover:bg-amber-50",
+    bg: "hover:bg-amber-500/10",
     icon: Settings,
   },
   register: {
@@ -110,7 +110,7 @@ const styles: Record<string, any> = {
     hoverColor: "hover:text-rose-700",
     border: "border-rose-500",
     hoverBorder: "hover:border-rose-600",
-    bg: "hover:bg-rose-50",
+    bg: "hover:bg-rose-500/10",
     icon: FileText,
   },
   receipt: {
@@ -118,7 +118,7 @@ const styles: Record<string, any> = {
     hoverColor: "hover:text-sky-700",
     border: "border-sky-500",
     hoverBorder: "hover:border-sky-600",
-    bg: "hover:bg-sky-50",
+    bg: "hover:bg-sky-500/10",
     icon: Receipt,
   },
   "reset-password": {
@@ -126,7 +126,7 @@ const styles: Record<string, any> = {
     hoverColor: "hover:text-sky-700",
     border: "border-sky-500",
     hoverBorder: "hover:border-sky-600",
-    bg: "hover:bg-sky-50",
+    bg: "hover:bg-sky-500/10",
     icon: Key,
   },
   purchases: {
@@ -134,7 +134,7 @@ const styles: Record<string, any> = {
     hoverColor: "hover:text-sky-700",
     border: "border-sky-500",
     hoverBorder: "hover:border-sky-600",
-    bg: "hover:bg-sky-50",
+    bg: "hover:bg-sky-500/10",
     icon: FileText,
   },
   mail: {
@@ -142,7 +142,7 @@ const styles: Record<string, any> = {
     hoverColor: "hover:text-sky-700",
     border: "border-sky-500",
     hoverBorder: "hover:border-sky-600",
-    bg: "hover:bg-sky-50",
+    bg: "hover:bg-sky-500/10",
     icon: Mails,
   },
   refresh: {
@@ -150,7 +150,7 @@ const styles: Record<string, any> = {
     hoverColor: "hover:text-orange-700",
     border: "border-orange-500",
     hoverBorder: "hover:border-orange-600",
-    bg: "hover:bg-orange-50",
+    bg: "hover:bg-orange-500/10",
     icon: RefreshCcw
   },
   accept: {
@@ -158,7 +158,7 @@ const styles: Record<string, any> = {
     hoverColor: "hover:text-green-700",
     border: "border-green-500",
     hoverBorder: "hover:border-green-600",
-    bg: "hover:bg-green-50",
+    bg: "hover:bg-green-500/10",
     icon: CheckCircle,
   },
   reject: {
@@ -166,7 +166,7 @@ const styles: Record<string, any> = {
     hoverColor: "hover:text-red-700",
     border: "border-red-500",
     hoverBorder: "hover:border-red-600",
-    bg: "hover:bg-red-50",
+    bg: "hover:bg-red-500/10",
     icon: XCircle,
   },
   printer: {
@@ -174,7 +174,7 @@ const styles: Record<string, any> = {
     hoverColor: "hover:text-gray-700",
     border: "border-gray-500",
     hoverBorder: "hover:border-gray-600",
-    bg: "hover:bg-gray-50",
+    bg: "hover:bg-gray-500/10",
     icon: Printer,
   },
   location: {
@@ -182,7 +182,7 @@ const styles: Record<string, any> = {
     hoverColor: "hover:text-blue-700",
     border: "border-blue-500",
     hoverBorder: "hover:border-blue-600",
-    bg: "hover:bg-blue-50",
+    bg: "hover:bg-blue-500/10",
     icon: MapPin,
   },
   convert: {
@@ -190,7 +190,7 @@ const styles: Record<string, any> = {
     hoverColor: "hover:text-amber-700",
     border: "border-amber-500",
     hoverBorder: "hover:border-amber-600",
-    bg: "hover:bg-amber-50",
+    bg: "hover:bg-amber-500/10",
     icon: ArrowLeftRight,
   },
   fuel: {
@@ -198,7 +198,7 @@ const styles: Record<string, any> = {
     hoverColor: "hover:text-orange-700",
     border: "border-orange-500",
     hoverBorder: "hover:border-orange-600",
-    bg: "hover:bg-orange-50",
+    bg: "hover:bg-orange-500/10",
     icon: Fuel,
   },
 

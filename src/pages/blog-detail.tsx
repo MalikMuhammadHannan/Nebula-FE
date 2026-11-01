@@ -194,7 +194,7 @@ const BlogDetail = () => {
                         value={comment}
                         onChange={(event) => setComment(event.target.value)}
                     />
-                    <Button type="submit" size="sm" className="self-end" disabled={isPostingComment}>
+                    <Button showArrow type="submit" size="sm" className="self-end" disabled={isPostingComment}>
                         {isPostingComment && <Loader2 className="animate-spin" />}
                         Post comment
                     </Button>
