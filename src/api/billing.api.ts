@@ -20,6 +20,11 @@ export interface CheckoutSessionResult {
     session_id: string;
 }
 
+export interface VerifySessionResult {
+    status: string;
+    token_balance: number;
+}
+
 export const billingApi = api.injectEndpoints({
     endpoints: (builder) => ({
         getTokenBalance: builder.query<TokenBalance, void>({
@@ -42,6 +47,14 @@ export const billingApi = api.injectEndpoints({
                 body,
             }),
         }),
+        verifyCheckoutSession: builder.mutation<VerifySessionResult, string>({
+            query: (session_id) => ({
+                url: "/billing/verify-session",
+                method: API_METHODS.POST,
+                body: { session_id },
+            }),
+            invalidatesTags: [RtkQueryTags.BILLING],
+        }),
     }),
 });
 
@@ -49,4 +62,5 @@ export const {
     useGetTokenBalanceQuery,
     useGetTokenPackagesQuery,
     useCreateCheckoutSessionMutation,
+    useVerifyCheckoutSessionMutation,
 } = billingApi;

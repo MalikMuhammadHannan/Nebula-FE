@@ -13,7 +13,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { formatDate } from "@/constants"
 import { ROUTES } from "@/constants/routes"
 import { getApiErrorMessage } from "@/lib/apiError"
-import { sanitizeHtml, stripHtml } from "@/lib/html"
+import { extractSources, sanitizeAndLinkifyHtml, splitUrls, stripHtml } from "@/lib/html"
 import type { RootState } from "@/store/store"
 
 const BlogDetail = () => {
@@ -97,6 +97,8 @@ const BlogDetail = () => {
         )
     }
 
+    const description = extractSources(stripHtml(blog.description))
+
     return (
         <article className="mx-auto flex max-w-3xl flex-col gap-6 pb-16">
             <Link to={ROUTES.LANDING} className="text-sm font-medium text-gradient-brand">
@@ -120,12 +122,47 @@ const BlogDetail = () => {
                 <h1 className="font-heading text-2xl font-semibold text-foreground sm:text-3xl">
                     {stripHtml(blog.title)}
                 </h1>
-                <p className="text-muted-foreground">{stripHtml(blog.description)}</p>
+                <p className="break-words text-muted-foreground">
+                    {splitUrls(description.text).map((segment, index) =>
+                        segment.type === "url" ? (
+                            <a
+                                key={index}
+                                href={segment.value}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="break-all text-gradient-brand underline-offset-2 hover:underline"
+                            >
+                                {segment.value}
+                            </a>
+                        ) : (
+                            segment.value
+                        ),
+                    )}
+                </p>
+                {description.sources.length > 0 && (
+                    <div className="flex flex-col gap-1 text-sm">
+                        <p className="font-medium text-foreground">Sources</p>
+                        <ul className="list-disc space-y-1 pl-5 text-muted-foreground">
+                            {description.sources.map((url) => (
+                                <li key={url}>
+                                    <a
+                                        href={url}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="break-all text-gradient-brand underline-offset-2 hover:underline"
+                                    >
+                                        {url}
+                                    </a>
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
+                )}
             </div>
 
             <div
-                className="text-sm leading-relaxed text-foreground [&_a]:text-gradient-brand [&_blockquote]:border-l-2 [&_blockquote]:border-border [&_blockquote]:pl-4 [&_blockquote]:italic [&_h1]:text-xl [&_h1]:font-semibold [&_h2]:text-lg [&_h2]:font-semibold [&_h3]:text-base [&_h3]:font-semibold [&_ol]:list-decimal [&_ol]:pl-5 [&_p]:mb-3 [&_ul]:list-disc [&_ul]:pl-5"
-                dangerouslySetInnerHTML={{ __html: sanitizeHtml(blog.content) }}
+                className="text-sm leading-relaxed text-foreground [&_a]:break-all [&_a]:text-gradient-brand [&_blockquote]:border-l-2 [&_blockquote]:border-border [&_blockquote]:pl-4 [&_blockquote]:italic [&_h1]:text-xl [&_h1]:font-semibold [&_h2]:text-lg [&_h2]:font-semibold [&_h3]:text-base [&_h3]:font-semibold [&_ol]:list-decimal [&_ol]:pl-5 [&_p]:mb-3 [&_ul]:list-disc [&_ul]:pl-5"
+                dangerouslySetInnerHTML={{ __html: sanitizeAndLinkifyHtml(blog.content) }}
             />
 
             <div className="flex items-center gap-3 border-y border-border/60 py-4">
